@@ -8,6 +8,7 @@ import tech.jitao.dmhub.responses.DmhAccessToken;
 import tech.jitao.dmhub.responses.DmhData;
 import tech.jitao.dmhub.responses.DmhScopes;
 import tech.jitao.dmhub.responses.customer.DmhCustomer;
+import tech.jitao.dmhub.responses.wechat.DmhWechatPubAccount;
 
 public interface DmHubApiInterface {
 
@@ -25,4 +26,8 @@ public interface DmHubApiInterface {
                                          @Query("select") String select,
                                          @Query("sort") String sort,
                                          @Query("limit") Integer limit);
+
+    // 微信
+    @GET("wechatPubAccounts")
+    Call<DmhData<DmhWechatPubAccount>> wechatPubAccounts(@Query("access_token") String accessToken);
 }
