@@ -1,4 +1,4 @@
-package tech.jitao.dmhub.exception;
+package com.github.flmn.dmhub.exception;
 
 public class GetAccessTokenException extends RuntimeException {
     public GetAccessTokenException(String message) {

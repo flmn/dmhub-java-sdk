@@ -1,14 +1,14 @@
-package tech.jitao.dmhub;
+package com.github.flmn.dmhub;
 
+import com.github.flmn.dmhub.responses.DmhAccessToken;
+import com.github.flmn.dmhub.responses.DmhData;
+import com.github.flmn.dmhub.responses.DmhScopes;
+import com.github.flmn.dmhub.responses.customer.DmhCustomer;
+import com.github.flmn.dmhub.responses.wechat.DmhWechatPubAccount;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
-import tech.jitao.dmhub.responses.DmhAccessToken;
-import tech.jitao.dmhub.responses.DmhData;
-import tech.jitao.dmhub.responses.DmhScopes;
-import tech.jitao.dmhub.responses.customer.DmhCustomer;
-import tech.jitao.dmhub.responses.wechat.DmhWechatPubAccount;
 
 public interface DmHubApiInterface {
 

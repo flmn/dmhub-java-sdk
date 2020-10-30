@@ -1,4 +1,4 @@
-package tech.jitao.dmhub.responses;
+package com.github.flmn.dmhub.responses;
 
 import java.util.List;
 

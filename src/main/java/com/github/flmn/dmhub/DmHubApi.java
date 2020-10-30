@@ -1,22 +1,22 @@
-package tech.jitao.dmhub;
+package com.github.flmn.dmhub;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.github.flmn.dmhub.exception.GetAccessTokenException;
+import com.github.flmn.dmhub.responses.DmhAccessToken;
+import com.github.flmn.dmhub.responses.DmhData;
+import com.github.flmn.dmhub.responses.DmhResult;
+import com.github.flmn.dmhub.responses.DmhScopes;
+import com.github.flmn.dmhub.responses.customer.DmhCustomer;
+import com.github.flmn.dmhub.responses.wechat.DmhWechatPubAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
-import tech.jitao.dmhub.exception.GetAccessTokenException;
-import tech.jitao.dmhub.responses.DmhAccessToken;
-import tech.jitao.dmhub.responses.DmhData;
-import tech.jitao.dmhub.responses.DmhResult;
-import tech.jitao.dmhub.responses.DmhScopes;
-import tech.jitao.dmhub.responses.customer.DmhCustomer;
-import tech.jitao.dmhub.responses.wechat.DmhWechatPubAccount;
 
 import java.io.IOException;
 import java.time.Instant;

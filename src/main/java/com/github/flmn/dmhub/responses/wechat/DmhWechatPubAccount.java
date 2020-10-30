@@ -1,4 +1,4 @@
-package tech.jitao.dmhub.responses.wechat;
+package com.github.flmn.dmhub.responses.wechat;
 
 public class DmhWechatPubAccount {
     private Integer id;

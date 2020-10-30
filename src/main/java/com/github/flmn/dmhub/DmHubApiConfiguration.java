@@ -1,4 +1,4 @@
-package tech.jitao.dmhub;
+package com.github.flmn.dmhub;
 
 public class DmHubApiConfiguration {
     private final String serverUrl;

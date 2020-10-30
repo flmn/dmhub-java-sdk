@@ -1,4 +1,4 @@
-package tech.jitao.dmhub.responses.customer;
+package com.github.flmn.dmhub.responses.customer;
 
 import java.math.BigDecimal;
 

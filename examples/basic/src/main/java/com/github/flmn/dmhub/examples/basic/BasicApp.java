@@ -1,11 +1,11 @@
-package tech.jitao.dmhub.examples.basic;
+package com.github.flmn.dmhub.examples.basic;
 
-import tech.jitao.dmhub.DmHubApi;
-import tech.jitao.dmhub.DmHubApiConfigurationBuilder;
-import tech.jitao.dmhub.exception.GetAccessTokenException;
-import tech.jitao.dmhub.responses.DmhData;
-import tech.jitao.dmhub.responses.customer.DmhCustomer;
-import tech.jitao.dmhub.responses.wechat.DmhWechatPubAccount;
+import com.github.flmn.dmhub.DmHubApi;
+import com.github.flmn.dmhub.DmHubApiConfigurationBuilder;
+import com.github.flmn.dmhub.exception.GetAccessTokenException;
+import com.github.flmn.dmhub.responses.DmhData;
+import com.github.flmn.dmhub.responses.customer.DmhCustomer;
+import com.github.flmn.dmhub.responses.wechat.DmhWechatPubAccount;
 
 public class BasicApp {
     public static void main(String[] args) {
@@ -19,6 +19,8 @@ public class BasicApp {
             dmHubApi.init();
         } catch (GetAccessTokenException e) {
             System.out.println(e);
+
+            return;
         }
 
         DmhData<DmhCustomer> customers = dmHubApi.listCustomers(null,
