@@ -1,0 +1,3 @@
+rootProject.name = 'dmhub-java-sdk-examples'
+
+include 'basic'

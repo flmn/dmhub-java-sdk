@@ -1,6 +1,1 @@
 rootProject.name = 'dmhub-java-sdk'
-
-file('examples').eachDir { dir ->
-    include dir.name
-    project(":${dir.name}").projectDir = file("examples/${dir.name}")
-}

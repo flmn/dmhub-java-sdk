@@ -1,0 +1,36 @@
+plugins {
+    id 'base'
+}
+
+def VERSION = new Date().format('yyyy.MM.dd')
+
+subprojects {
+    apply plugin: 'java'
+
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+    [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+    group = 'com.github.flmn.dmhub.examples'
+    version = VERSION
+
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven { url 'https://jitpack.io' }
+    }
+
+    dependencies {
+        implementation(
+                "com.github.flmn.dmhub-java-sdk:dmhub-java-sdk:0.0.1",
+                "ch.qos.logback:logback-classic:1.2.3",
+        )
+    }
+}
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:all"
+        }
+    }
+}
