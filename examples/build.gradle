@@ -21,7 +21,7 @@ subprojects {
 
     dependencies {
         implementation(
-                "com.github.flmn.dmhub-java-sdk:dmhub-java-sdk:0.0.1",
+                "com.github.flmn:dmhub-java-sdk:0.0.2",
                 "ch.qos.logback:logback-classic:1.2.3",
         )
     }

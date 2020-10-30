@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.github.flmn.dmhub.exception.GetAccessTokenException;
+import com.github.flmn.dmhub.exception.DmHubSdkException;
 import com.github.flmn.dmhub.responses.DmhAccessToken;
 import com.github.flmn.dmhub.responses.DmhData;
 import com.github.flmn.dmhub.responses.DmhResult;
@@ -28,6 +28,7 @@ public class DmHubApi {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final DmHubApiConfiguration cfg;
     private DmHubApiInterface dmHubApiInterface;
+    private boolean initialized = false;
     private String accessToken;
     private Instant validUtil;
 
@@ -35,7 +36,7 @@ public class DmHubApi {
         this.cfg = cfg;
     }
 
-    public void init() throws GetAccessTokenException {
+    public void init() throws DmHubSdkException {
         final ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 //        objectMapper.registerModule(new JavaTimeModule());
@@ -51,6 +52,8 @@ public class DmHubApi {
 
         //
         refreshAccessToken();
+
+        initialized = true;
     }
 
     public DmhScopes getScopes() {
@@ -63,8 +66,8 @@ public class DmHubApi {
 
     public DmhData<DmhCustomer> listCustomers(String select,
                                               String sort,
-                                              Integer limit) throws GetAccessTokenException {
-        checkAccessToken();
+                                              Integer limit) throws DmHubSdkException {
+        check();
 
         Call<DmhData<DmhCustomer>> call = dmHubApiInterface.customers(accessToken,
                 select,
@@ -75,8 +78,8 @@ public class DmHubApi {
     }
 
     // 微信
-    public DmhData<DmhWechatPubAccount> listWechatPubAccounts() throws GetAccessTokenException {
-        checkAccessToken();
+    public DmhData<DmhWechatPubAccount> listWechatPubAccounts() throws DmHubSdkException {
+        check();
 
         Call<DmhData<DmhWechatPubAccount>> call = dmHubApiInterface.wechatPubAccounts(accessToken);
 
@@ -85,7 +88,11 @@ public class DmHubApi {
 
     // 私有方法
 
-    private void checkAccessToken() throws GetAccessTokenException {
+    private void check() throws DmHubSdkException {
+        if (!initialized) {
+            throw new DmHubSdkException("Please call init() first.");
+        }
+
         Instant now = Instant.now();
         if (now.isAfter(validUtil)) { // 如果当前时间已经超出有效期，直接同步刷新
             refreshAccessToken();
@@ -94,20 +101,20 @@ public class DmHubApi {
         }
     }
 
-    private void refreshAccessToken() throws GetAccessTokenException {
+    private void refreshAccessToken() throws DmHubSdkException {
         Call<DmhAccessToken> call = dmHubApiInterface.oauth2Token(cfg.getAppId(), cfg.getAppSecret(), GRANT_TYPE);
         DmhAccessToken dmhAccessToken = result(call, "getAccessToken");
 
         if (dmhAccessToken == null) {
             logger.warn("refreshAccessToken error: dmhAccessToken is null");
 
-            throw new GetAccessTokenException("Response is null");
+            throw new DmHubSdkException("Response is null when refresh access token.");
         }
 
         if (dmhAccessToken.getError() != null) {
             logger.warn("refreshAccessToken error: {}", dmhAccessToken.getError());
 
-            throw new GetAccessTokenException(dmhAccessToken.getError().getMessage());
+            throw new DmHubSdkException(dmhAccessToken.getError().getMessage());
         }
 
         if (dmhAccessToken.getAccessToken() == null ||
@@ -115,7 +122,7 @@ public class DmHubApi {
 
             logger.warn("refreshAccessToken error: {}", dmhAccessToken);
 
-            throw new GetAccessTokenException("access_token or expires_in is null");
+            throw new DmHubSdkException("access_token or expires_in is null when refresh.");
         }
 
         accessToken = dmhAccessToken.getAccessToken();
