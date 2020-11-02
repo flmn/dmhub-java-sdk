@@ -1,14 +1,15 @@
 package com.github.flmn.dmhub;
 
+import com.github.flmn.dmhub.dto.DmhData;
+import com.github.flmn.dmhub.dto.DmhResult;
 import com.github.flmn.dmhub.dto.customer.CreateCustomerRequest;
 import com.github.flmn.dmhub.dto.customer.DmhCustomer;
 import com.github.flmn.dmhub.dto.customer.DmhIdentity;
 import com.github.flmn.dmhub.dto.customer.Genders;
 import com.github.flmn.dmhub.exception.DmHubSdkException;
 import com.github.flmn.dmhub.util.TimeUtils;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import com.google.common.collect.Lists;
+import org.junit.jupiter.api.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DmHubApiTest {
@@ -32,7 +33,8 @@ class DmHubApiTest {
     }
 
     @Test
-    void test() {
+    @Disabled
+    void createCustomer() {
         CreateCustomerRequest request = new CreateCustomerRequest();
         DmhCustomer customer = new DmhCustomer();
         customer.setName("testqi2");
@@ -68,5 +70,68 @@ class DmHubApiTest {
         } else {
             System.out.println(customer);
         }
+    }
+
+    @Test
+    @Disabled
+    void bulkCreateCustomer() {
+        CreateCustomerRequest request = new CreateCustomerRequest();
+        DmhCustomer customer = new DmhCustomer();
+        customer.setName("testqi1-0617-3");
+        customer.setMobile("18356348977");
+        customer.setBirthday("2019-06-09");
+        customer.setDateJoin(TimeUtils.parseZonedDateTime("2019-06-07T09:08:07Z"));
+        customer.setMember(true);
+
+        DmhIdentity identity = new DmhIdentity();
+        identity.setType("wehcat");
+        identity.setValue("testqi1-0617-2");
+        request.setIdentity(identity);
+
+        DmhResult result = dmHubApi.bulkCreateCustomer(Lists.newArrayList(request), false);
+        System.out.println(result);
+    }
+
+    @Test
+    @Disabled
+    void listCustomers() {
+        DmhData<DmhCustomer> customers = dmHubApi.listCustomers(null,
+                "-dateJoin",
+                100,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+
+        if (customers.getError() != null) {
+            System.out.println(customers.getError());
+        } else if (customers.getData() == null || customers.getData().isEmpty()) {
+            System.out.println(customers.getData());
+        } else {
+            customers.getData().forEach(System.out::println);
+        }
+    }
+
+    @Test
+    @Disabled
+    void findCustomerByIdentity() {
+        DmhCustomer customer = dmHubApi.findCustomerByIdentity("wechat", "ogrw7v8X8-6S8fV-E5BGyZIFnJa4");
+        if (customer.getError() != null) {
+            System.out.println(customer.getError());
+        } else {
+            System.out.println(customer);
+        }
+    }
+
+    @Test
+    void idMapping() {
+        String clCid = dmHubApi.customerIdToClCid(814443154529861632L);
+        System.out.println(clCid);
+        Long customerId = dmHubApi.clCidToCustomerId(clCid);
+        System.out.println(customerId);
+
+        Assertions.assertEquals(814443154529861632L, customerId);
     }
 }

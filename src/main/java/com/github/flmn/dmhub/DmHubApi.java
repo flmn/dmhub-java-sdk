@@ -11,6 +11,7 @@ import com.github.flmn.dmhub.dto.DmhResult;
 import com.github.flmn.dmhub.dto.DmhScopes;
 import com.github.flmn.dmhub.dto.customer.CreateCustomerRequest;
 import com.github.flmn.dmhub.dto.customer.DmhCustomer;
+import com.github.flmn.dmhub.dto.customer.IdMappingResult;
 import com.github.flmn.dmhub.dto.wechat.DmhWechatPubAccount;
 import com.github.flmn.dmhub.exception.DmHubSdkException;
 import org.slf4j.Logger;
@@ -22,7 +23,9 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 public class DmHubApi {
     private static final String GRANT_TYPE = "client_credentials";
@@ -78,17 +81,73 @@ public class DmHubApi {
         return result(call, "createCustomer");
     }
 
+    public DmhResult bulkCreateCustomer(List<CreateCustomerRequest> request, boolean forceUpdate) {
+        check();
+
+        Call<DmhResult> call = dmHubApiInterface.customersBulkAdd(accessToken,
+                forceUpdate,
+                request);
+
+        return result(call, "bulkCreateCustomer");
+    }
+
     public DmhData<DmhCustomer> listCustomers(String select,
                                               String sort,
-                                              Integer limit) throws DmHubSdkException {
+                                              Integer limit,
+                                              Long id,
+                                              ZonedDateTime dateJoin,
+                                              ZonedDateTime lastUpdated,
+                                              String stage,
+                                              String mobile,
+                                              String email) throws DmHubSdkException {
         check();
 
         Call<DmhData<DmhCustomer>> call = dmHubApiInterface.customers(accessToken,
                 select,
                 sort,
-                limit);
+                limit,
+                id,
+                dateJoin,
+                lastUpdated,
+                stage,
+                mobile,
+                email);
 
         return result(call, "listCustomers");
+    }
+
+    public DmhCustomer findCustomerByIdentity(String identityType, String identityValue) {
+        check();
+
+        Call<DmhCustomer> call = dmHubApiInterface.customerServiceFindCustomerByIdentity(accessToken,
+                identityType,
+                identityValue);
+
+        return result(call, "findCustomerByIdentity");
+    }
+
+    public String customerIdToClCid(Long customerId) {
+        check();
+
+        Call<IdMappingResult> call = dmHubApiInterface.customerServiceIdMapping(accessToken,
+                customerId,
+                null);
+
+        IdMappingResult result = result(call, "customerIdToClCid");
+
+        return result.getClCid();
+    }
+
+    public Long clCidToCustomerId(String clCid) {
+        check();
+
+        Call<IdMappingResult> call = dmHubApiInterface.customerServiceIdMapping(accessToken,
+                null,
+                clCid);
+
+        IdMappingResult result = result(call, "clCidToCustomerId");
+
+        return result.getCustomerId();
     }
 
     // ******************** 微信 ********************
@@ -117,7 +176,7 @@ public class DmHubApi {
     }
 
     private synchronized void refreshAccessToken() throws DmHubSdkException {
-        if (!Instant.now().isAfter(validUtil)) {
+        if (validUtil != null && !Instant.now().isAfter(validUtil)) {
             return;
         }
 
