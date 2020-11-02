@@ -1,4 +1,4 @@
-package com.github.flmn.dmhub.responses;
+package com.github.flmn.dmhub.dto;
 
 import java.util.List;
 import java.util.StringJoiner;

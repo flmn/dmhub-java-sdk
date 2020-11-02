@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'com.github.flmn.dmhub'
-version = '0.0.3'
+version = '0.0.4'
 sourceCompatibility = '1.8'
 
 repositories {
@@ -15,6 +15,7 @@ dependencies {
             'com.google.guava:guava:30.0-jre',
             'com.squareup.retrofit2:retrofit:2.9.0',
             'com.squareup.retrofit2:converter-jackson:2.9.0',
+            'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.1',
             'org.slf4j:slf4j-api:1.7.30'
     )
     testImplementation(

@@ -4,13 +4,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.github.flmn.dmhub.dto.DmhAccessToken;
+import com.github.flmn.dmhub.dto.DmhData;
+import com.github.flmn.dmhub.dto.DmhResult;
+import com.github.flmn.dmhub.dto.DmhScopes;
+import com.github.flmn.dmhub.dto.customer.CreateCustomerRequest;
+import com.github.flmn.dmhub.dto.customer.DmhCustomer;
+import com.github.flmn.dmhub.dto.wechat.DmhWechatPubAccount;
 import com.github.flmn.dmhub.exception.DmHubSdkException;
-import com.github.flmn.dmhub.responses.DmhAccessToken;
-import com.github.flmn.dmhub.responses.DmhData;
-import com.github.flmn.dmhub.responses.DmhResult;
-import com.github.flmn.dmhub.responses.DmhScopes;
-import com.github.flmn.dmhub.responses.customer.DmhCustomer;
-import com.github.flmn.dmhub.responses.wechat.DmhWechatPubAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
@@ -39,7 +41,7 @@ public class DmHubApi {
     public void init() throws DmHubSdkException {
         final ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-//        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
@@ -57,12 +59,24 @@ public class DmHubApi {
     }
 
     public DmhScopes getScopes() {
+        check();
+
         Call<DmhScopes> call = dmHubApiInterface.oauth2Scopes(accessToken);
 
         return result(call, "getScopes");
     }
 
-    // 客户
+    // ******************** 客户 ********************
+
+    public DmhCustomer createCustomer(CreateCustomerRequest request, boolean forceUpdate) {
+        check();
+
+        Call<DmhCustomer> call = dmHubApiInterface.customers(accessToken,
+                forceUpdate,
+                request);
+
+        return result(call, "createCustomer");
+    }
 
     public DmhData<DmhCustomer> listCustomers(String select,
                                               String sort,
@@ -77,7 +91,8 @@ public class DmHubApi {
         return result(call, "listCustomers");
     }
 
-    // 微信
+    // ******************** 微信 ********************
+
     public DmhData<DmhWechatPubAccount> listWechatPubAccounts() throws DmHubSdkException {
         check();
 
@@ -86,7 +101,7 @@ public class DmHubApi {
         return result(call, "listWechatPubAccounts");
     }
 
-    // 私有方法
+    // ******************** 私有方法 ********************
 
     private void check() throws DmHubSdkException {
         if (!initialized) {
@@ -94,14 +109,18 @@ public class DmHubApi {
         }
 
         Instant now = Instant.now();
-        if (now.isAfter(validUtil)) { // 如果当前时间已经超出有效期，直接同步刷新
+        if (now.isAfter(validUtil)) { // 如果当前时间已经超出有效期，同步刷新
             refreshAccessToken();
 
             return;
         }
     }
 
-    private void refreshAccessToken() throws DmHubSdkException {
+    private synchronized void refreshAccessToken() throws DmHubSdkException {
+        if (!Instant.now().isAfter(validUtil)) {
+            return;
+        }
+
         Call<DmhAccessToken> call = dmHubApiInterface.oauth2Token(cfg.getAppId(), cfg.getAppSecret(), GRANT_TYPE);
         DmhAccessToken dmhAccessToken = result(call, "getAccessToken");
 
@@ -129,7 +148,7 @@ public class DmHubApi {
         validUtil = Instant.now().plus(dmhAccessToken.getExpiresIn() - MARGIN, ChronoUnit.SECONDS);
     }
 
-    //结果检查
+    // 结果检查
     private <T extends DmhResult> T result(Call<T> call, String func) {
         try {
             Response<T> response = call.execute();

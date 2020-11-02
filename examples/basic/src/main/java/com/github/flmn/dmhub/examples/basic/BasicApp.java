@@ -3,9 +3,9 @@ package com.github.flmn.dmhub.examples.basic;
 import com.github.flmn.dmhub.DmHubApi;
 import com.github.flmn.dmhub.DmHubApiConfigurationBuilder;
 import com.github.flmn.dmhub.exception.GetAccessTokenException;
-import com.github.flmn.dmhub.responses.DmhData;
-import com.github.flmn.dmhub.responses.customer.DmhCustomer;
-import com.github.flmn.dmhub.responses.wechat.DmhWechatPubAccount;
+import com.github.flmn.dmhub.dto.DmhData;
+import com.github.flmn.dmhub.dto.customer.DmhCustomer;
+import com.github.flmn.dmhub.dto.wechat.DmhWechatPubAccount;
 
 public class BasicApp {
     public static void main(String[] args) {
