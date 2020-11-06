@@ -2,14 +2,18 @@ package com.github.flmn.dmhub;
 
 import com.github.flmn.dmhub.dto.DmhData;
 import com.github.flmn.dmhub.dto.DmhResult;
-import com.github.flmn.dmhub.dto.customer.CreateCustomerRequest;
+import com.github.flmn.dmhub.dto.customer.DmhCreateCustomerRequest;
 import com.github.flmn.dmhub.dto.customer.DmhCustomer;
+import com.github.flmn.dmhub.dto.customer.DmhGenders;
 import com.github.flmn.dmhub.dto.customer.DmhIdentity;
-import com.github.flmn.dmhub.dto.customer.Genders;
+import com.github.flmn.dmhub.dto.event.DmhEvent;
 import com.github.flmn.dmhub.exception.DmHubSdkException;
 import com.github.flmn.dmhub.util.TimeUtils;
-import com.google.common.collect.Lists;
 import org.junit.jupiter.api.*;
+
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.Collections;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DmHubApiTest {
@@ -35,10 +39,10 @@ class DmHubApiTest {
     @Test
     @Disabled
     void createCustomer() {
-        CreateCustomerRequest request = new CreateCustomerRequest();
+        DmhCreateCustomerRequest request = new DmhCreateCustomerRequest();
         DmhCustomer customer = new DmhCustomer();
         customer.setName("testqi2");
-        customer.setGender(Genders.FEMALE);
+        customer.setGender(DmhGenders.FEMALE);
         customer.setMobile("18356348977");
         customer.setEmail("li.wang@163.com");
         customer.setBirthday("2000-11-19");
@@ -75,7 +79,7 @@ class DmHubApiTest {
     @Test
     @Disabled
     void bulkCreateCustomer() {
-        CreateCustomerRequest request = new CreateCustomerRequest();
+        DmhCreateCustomerRequest request = new DmhCreateCustomerRequest();
         DmhCustomer customer = new DmhCustomer();
         customer.setName("testqi1-0617-3");
         customer.setMobile("18356348977");
@@ -88,7 +92,7 @@ class DmHubApiTest {
         identity.setValue("testqi1-0617-2");
         request.setIdentity(identity);
 
-        DmhResult result = dmHubApi.bulkCreateCustomer(Lists.newArrayList(request), false);
+        DmhResult result = dmHubApi.bulkCreateCustomer(Collections.singletonList(request), false);
         System.out.println(result);
     }
 
@@ -126,6 +130,7 @@ class DmHubApiTest {
     }
 
     @Test
+    @Disabled
     void idMapping() {
         String clCid = dmHubApi.customerIdToClCid(814443154529861632L);
         System.out.println(clCid);
@@ -134,4 +139,31 @@ class DmHubApiTest {
 
         Assertions.assertEquals(814443154529861632L, customerId);
     }
+
+    @Test
+    void createEvent() {
+        DmhEvent event = new DmhEvent();
+        event.setCustomerId(814443154529861632L);
+        event.setEvent("c_sdk_test");
+        event.setDate(ZonedDateTime.now(ZoneOffset.UTC));
+        event.setSource("人民广场");
+        event.setSource1("销售部");
+        event.addCustomField("c_sdk_version", "0.0.3");
+
+        event = dmHubApi.createEvent(event, false);
+
+        System.out.println(event);
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+

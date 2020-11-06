@@ -1,15 +1,24 @@
 package com.github.flmn.dmhub.util;
 
+import com.github.flmn.util.StringUtils;
+
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
-public class TimeUtils {
-    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
+public final class TimeUtils {
     private TimeUtils() {
     }
 
     public static ZonedDateTime parseZonedDateTime(String s) {
-        return ZonedDateTime.parse(s, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        if (StringUtils.isNullOrEmpty(s)) {
+            return null;
+        }
+
+        try {
+            return ZonedDateTime.parse(s, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        } catch (DateTimeParseException ignored) {
+            return null;
+        }
     }
 }

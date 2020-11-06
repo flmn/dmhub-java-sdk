@@ -1,6 +1,6 @@
 package com.github.flmn.dmhub.dto.customer;
 
-public class CreateCustomerRequest {
+public class DmhCreateCustomerRequest {
     private DmhCustomer customer;
     private DmhIdentity identity;
 

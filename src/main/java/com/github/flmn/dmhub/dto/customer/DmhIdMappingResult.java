@@ -3,7 +3,7 @@ package com.github.flmn.dmhub.dto.customer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.flmn.dmhub.dto.DmhResult;
 
-public class IdMappingResult extends DmhResult {
+public class DmhIdMappingResult extends DmhResult {
     private Long customerId;
 
     @JsonProperty("cl_cid")

@@ -9,9 +9,10 @@ import com.github.flmn.dmhub.dto.DmhAccessToken;
 import com.github.flmn.dmhub.dto.DmhData;
 import com.github.flmn.dmhub.dto.DmhResult;
 import com.github.flmn.dmhub.dto.DmhScopes;
-import com.github.flmn.dmhub.dto.customer.CreateCustomerRequest;
+import com.github.flmn.dmhub.dto.customer.DmhCreateCustomerRequest;
 import com.github.flmn.dmhub.dto.customer.DmhCustomer;
-import com.github.flmn.dmhub.dto.customer.IdMappingResult;
+import com.github.flmn.dmhub.dto.customer.DmhIdMappingResult;
+import com.github.flmn.dmhub.dto.event.DmhEvent;
 import com.github.flmn.dmhub.dto.wechat.DmhWechatPubAccount;
 import com.github.flmn.dmhub.exception.DmHubSdkException;
 import org.slf4j.Logger;
@@ -26,6 +27,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 
 public class DmHubApi {
     private static final String GRANT_TYPE = "client_credentials";
@@ -71,7 +73,7 @@ public class DmHubApi {
 
     // ******************** 客户 ********************
 
-    public DmhCustomer createCustomer(CreateCustomerRequest request, boolean forceUpdate) {
+    public DmhCustomer createCustomer(DmhCreateCustomerRequest request, boolean forceUpdate) {
         check();
 
         Call<DmhCustomer> call = dmHubApiInterface.customers(accessToken,
@@ -81,7 +83,7 @@ public class DmHubApi {
         return result(call, "createCustomer");
     }
 
-    public DmhResult bulkCreateCustomer(List<CreateCustomerRequest> request, boolean forceUpdate) {
+    public DmhResult bulkCreateCustomer(List<DmhCreateCustomerRequest> request, boolean forceUpdate) {
         check();
 
         Call<DmhResult> call = dmHubApiInterface.customersBulkAdd(accessToken,
@@ -129,11 +131,11 @@ public class DmHubApi {
     public String customerIdToClCid(Long customerId) {
         check();
 
-        Call<IdMappingResult> call = dmHubApiInterface.customerServiceIdMapping(accessToken,
+        Call<DmhIdMappingResult> call = dmHubApiInterface.customerServiceIdMapping(accessToken,
                 customerId,
                 null);
 
-        IdMappingResult result = result(call, "customerIdToClCid");
+        DmhIdMappingResult result = result(call, "customerIdToClCid");
 
         return result.getClCid();
     }
@@ -141,13 +143,31 @@ public class DmHubApi {
     public Long clCidToCustomerId(String clCid) {
         check();
 
-        Call<IdMappingResult> call = dmHubApiInterface.customerServiceIdMapping(accessToken,
+        Call<DmhIdMappingResult> call = dmHubApiInterface.customerServiceIdMapping(accessToken,
                 null,
                 clCid);
 
-        IdMappingResult result = result(call, "clCidToCustomerId");
+        DmhIdMappingResult result = result(call, "clCidToCustomerId");
 
         return result.getCustomerId();
+    }
+
+    // ******************** 客户事件 ********************
+
+    public DmhEvent createEvent(DmhEvent event, boolean trackIp) {
+        check();
+
+        event.setId(null);
+
+        Call<Map<String, Object>> call = dmHubApiInterface.customerEvents(accessToken, trackIp, event.toMap());
+
+        Map<String, Object> result = mapResult(call, "createEvent");
+
+        if (result == null) {
+            return null;
+        }
+
+        return new DmhEvent(result);
     }
 
     // ******************** 微信 ********************
@@ -211,6 +231,25 @@ public class DmHubApi {
     private <T extends DmhResult> T result(Call<T> call, String func) {
         try {
             Response<T> response = call.execute();
+            if (response.isSuccessful()) {
+                logger.info("{}, code={}, message={}", func, response.code(), response.message());
+
+                return response.body();
+            } else {
+                logger.warn("{} not successful, code={}, message={}", func, response.code(), response.message());
+
+                return null;
+            }
+        } catch (IOException e) {
+            logger.warn("{}, IOException, message={}", func, e.getMessage());
+
+            return null;
+        }
+    }
+
+    private Map<String, Object> mapResult(Call<Map<String, Object>> call, String func) {
+        try {
+            Response<Map<String, Object>> response = call.execute();
             if (response.isSuccessful()) {
                 logger.info("{}, code={}, message={}", func, response.code(), response.message());
 

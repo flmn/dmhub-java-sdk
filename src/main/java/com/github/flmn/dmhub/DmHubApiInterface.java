@@ -4,9 +4,9 @@ import com.github.flmn.dmhub.dto.DmhAccessToken;
 import com.github.flmn.dmhub.dto.DmhData;
 import com.github.flmn.dmhub.dto.DmhResult;
 import com.github.flmn.dmhub.dto.DmhScopes;
-import com.github.flmn.dmhub.dto.customer.CreateCustomerRequest;
+import com.github.flmn.dmhub.dto.customer.DmhCreateCustomerRequest;
 import com.github.flmn.dmhub.dto.customer.DmhCustomer;
-import com.github.flmn.dmhub.dto.customer.IdMappingResult;
+import com.github.flmn.dmhub.dto.customer.DmhIdMappingResult;
 import com.github.flmn.dmhub.dto.wechat.DmhWechatPubAccount;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -16,6 +16,7 @@ import retrofit2.http.Query;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface DmHubApiInterface {
 
@@ -33,12 +34,12 @@ public interface DmHubApiInterface {
     @POST("customers")
     Call<DmhCustomer> customers(@Query("access_token") String accessToken,
                                 @Query("forceUpdate") boolean forceUpdate,
-                                @Body CreateCustomerRequest request);
+                                @Body DmhCreateCustomerRequest request);
 
     @POST("customers/bulkAdd")
     Call<DmhResult> customersBulkAdd(@Query("access_token") String accessToken,
                                      @Query("forceUpdate") boolean forceUpdate,
-                                     @Body List<CreateCustomerRequest> request);
+                                     @Body List<DmhCreateCustomerRequest> request);
 
     @GET("customers")
     Call<DmhData<DmhCustomer>> customers(@Query("access_token") String accessToken,
@@ -58,11 +59,19 @@ public interface DmHubApiInterface {
                                                             @Query("identityValue") String identityValue);
 
     @GET("customerService/idMapping")
-    Call<IdMappingResult> customerServiceIdMapping(@Query("access_token") String accessToken,
-                                                   @Query("customerId") Long customerId,
-                                                   @Query("cl_cid") String clCid);
+    Call<DmhIdMappingResult> customerServiceIdMapping(@Query("access_token") String accessToken,
+                                                      @Query("customerId") Long customerId,
+                                                      @Query("cl_cid") String clCid);
+
+    // ******************** 客户事件 ********************
+
+    @POST("customerEvents")
+    Call<Map<String, Object>> customerEvents(@Query("access_token") String accessToken,
+                                             @Query("trackIp") boolean trackIp,
+                                             @Body Map<String, Object> event);
 
     // ******************** 微信 ********************
+
     @GET("wechatPubAccounts")
     Call<DmhData<DmhWechatPubAccount>> wechatPubAccounts(@Query("access_token") String accessToken);
 }

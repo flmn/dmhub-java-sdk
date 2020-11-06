@@ -8,11 +8,12 @@ sourceCompatibility = '1.8'
 
 repositories {
     jcenter()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
     implementation(
-            'com.google.guava:guava:30.0-jre',
+            'com.github.flmn:trivial-java-utils:0.0.2',
             'com.squareup.retrofit2:retrofit:2.9.0',
             'com.squareup.retrofit2:converter-jackson:2.9.0',
             'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.1',
