@@ -2,10 +2,9 @@ package com.github.flmn.dmhub.examples.basic;
 
 import com.github.flmn.dmhub.DmHubApi;
 import com.github.flmn.dmhub.DmHubApiConfigurationBuilder;
-import com.github.flmn.dmhub.exception.GetAccessTokenException;
 import com.github.flmn.dmhub.common.dto.DmhData;
-import com.github.flmn.dmhub.common.dto.customer.DmhCustomer;
-import com.github.flmn.dmhub.common.dto.wechat.DmhWechatPubAccount;
+import com.github.flmn.dmhub.customer.dto.DmhCustomer;
+import com.github.flmn.dmhub.wechat.dto.DmhWechatPubAccount;
 
 public class BasicApp {
     public static void main(String[] args) {
@@ -15,17 +14,17 @@ public class BasicApp {
                 .appSecret("YOUR_APP_SECRET");
 
         DmHubApi dmHubApi = new DmHubApi(builder.build());
-        try {
-            dmHubApi.init();
-        } catch (GetAccessTokenException e) {
-            System.out.println(e);
+        dmHubApi.init();
 
-            return;
-        }
-
-        DmhData<DmhCustomer> customers = dmHubApi.listCustomers(null,
+        DmhData<DmhCustomer> customers = dmHubApi.opsForCustomer().listCustomers(null,
                 "-dateJoin",
-                10);
+                100,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
 
         if (customers.getError() != null) {
             System.out.println(customers);
@@ -33,7 +32,7 @@ public class BasicApp {
             customers.getData().forEach(System.out::println);
         }
 
-        DmhData<DmhWechatPubAccount> wechatPubAccounts = dmHubApi.listWechatPubAccounts();
+        DmhData<DmhWechatPubAccount> wechatPubAccounts = dmHubApi.opsForWechat().listWechatPubAccounts();
         if (wechatPubAccounts.getError() != null) {
             System.out.println(wechatPubAccounts);
         } else {
