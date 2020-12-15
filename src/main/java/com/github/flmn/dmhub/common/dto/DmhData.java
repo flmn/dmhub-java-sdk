@@ -1,4 +1,4 @@
-package com.github.flmn.dmhub.dto;
+package com.github.flmn.dmhub.common.dto;
 
 import java.util.List;
 

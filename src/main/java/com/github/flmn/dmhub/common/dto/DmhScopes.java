@@ -1,4 +1,4 @@
-package com.github.flmn.dmhub.dto;
+package com.github.flmn.dmhub.common.dto;
 
 public class DmhScopes extends DmhResult {
     private String scope;

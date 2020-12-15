@@ -1,6 +1,6 @@
-package com.github.flmn.dmhub.dto.customer;
+package com.github.flmn.dmhub.customer.dto;
 
-import com.github.flmn.dmhub.dto.DmhResult;
+import com.github.flmn.dmhub.common.dto.DmhResult;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;

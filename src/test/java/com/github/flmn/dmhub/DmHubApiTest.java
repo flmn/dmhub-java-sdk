@@ -1,12 +1,14 @@
 package com.github.flmn.dmhub;
 
-import com.github.flmn.dmhub.dto.DmhData;
-import com.github.flmn.dmhub.dto.DmhResult;
-import com.github.flmn.dmhub.dto.customer.DmhCreateCustomerRequest;
-import com.github.flmn.dmhub.dto.customer.DmhCustomer;
-import com.github.flmn.dmhub.dto.customer.DmhGenders;
-import com.github.flmn.dmhub.dto.customer.DmhIdentity;
-import com.github.flmn.dmhub.dto.event.DmhEvent;
+import com.github.flmn.dmhub.common.dto.DmhData;
+import com.github.flmn.dmhub.common.dto.DmhResult;
+import com.github.flmn.dmhub.customer.DmhOpsForCustomer;
+import com.github.flmn.dmhub.customer.dto.DmhCreateCustomerRequest;
+import com.github.flmn.dmhub.customer.dto.DmhCustomer;
+import com.github.flmn.dmhub.customer.dto.DmhGenders;
+import com.github.flmn.dmhub.customer.dto.DmhIdentity;
+import com.github.flmn.dmhub.event.DmhOpsForEvent;
+import com.github.flmn.dmhub.event.dto.DmhEvent;
 import com.github.flmn.dmhub.exception.DmHubSdkException;
 import com.github.flmn.dmhub.util.TimeUtils;
 import org.junit.jupiter.api.*;
@@ -31,8 +33,6 @@ class DmHubApiTest {
             dmHubApi.init();
         } catch (DmHubSdkException e) {
             System.out.println(e);
-
-            return;
         }
     }
 
@@ -68,7 +68,8 @@ class DmHubApiTest {
         identity.setName("手机号");
         request.setIdentity(identity);
 
-        customer = dmHubApi.createCustomer(request, false);
+        DmhOpsForCustomer ops = dmHubApi.opsForCustomer();
+        customer = ops.createCustomer(request, false);
         if (customer.getError() != null) {
             System.out.println(customer.getError());
         } else {
@@ -92,14 +93,16 @@ class DmHubApiTest {
         identity.setValue("testqi1-0617-2");
         request.setIdentity(identity);
 
-        DmhResult result = dmHubApi.bulkCreateCustomer(Collections.singletonList(request), false);
+        DmhOpsForCustomer ops = dmHubApi.opsForCustomer();
+        DmhResult result = ops.bulkCreateCustomer(Collections.singletonList(request), false);
         System.out.println(result);
     }
 
     @Test
     @Disabled
     void listCustomers() {
-        DmhData<DmhCustomer> customers = dmHubApi.listCustomers(null,
+        DmhOpsForCustomer ops = dmHubApi.opsForCustomer();
+        DmhData<DmhCustomer> customers = ops.listCustomers(null,
                 "-dateJoin",
                 100,
                 null,
@@ -121,7 +124,8 @@ class DmHubApiTest {
     @Test
     @Disabled
     void findCustomerByIdentity() {
-        DmhCustomer customer = dmHubApi.findCustomerByIdentity("wechat", "ogrw7v8X8-6S8fV-E5BGyZIFnJa4");
+        DmhOpsForCustomer ops = dmHubApi.opsForCustomer();
+        DmhCustomer customer = ops.findCustomerByIdentity("wechat", "ogrw7v8X8-6S8fV-E5BGyZIFnJa4");
         if (customer.getError() != null) {
             System.out.println(customer.getError());
         } else {
@@ -130,17 +134,18 @@ class DmHubApiTest {
     }
 
     @Test
-    @Disabled
     void idMapping() {
-        String clCid = dmHubApi.customerIdToClCid(814443154529861632L);
+        DmhOpsForCustomer ops = dmHubApi.opsForCustomer();
+        String clCid = ops.customerIdToClCid(814443154529861632L);
         System.out.println(clCid);
-        Long customerId = dmHubApi.clCidToCustomerId(clCid);
+        Long customerId = ops.clCidToCustomerId(clCid);
         System.out.println(customerId);
 
         Assertions.assertEquals(814443154529861632L, customerId);
     }
 
     @Test
+    @Disabled
     void createEvent() {
         DmhEvent event = new DmhEvent();
         event.setCustomerId(814443154529861632L);
@@ -150,7 +155,8 @@ class DmHubApiTest {
         event.setSource1("销售部");
         event.addCustomField("c_sdk_version", "0.0.3");
 
-        event = dmHubApi.createEvent(event, false);
+        DmhOpsForEvent ops = dmHubApi.opsForEvent();
+        event = ops.createEvent(event, false);
 
         System.out.println(event);
     }

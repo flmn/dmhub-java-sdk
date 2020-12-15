@@ -1,4 +1,4 @@
-package com.github.flmn.dmhub.dto.customer;
+package com.github.flmn.dmhub.customer.dto;
 
 public class DmhCreateCustomerRequest {
     private DmhCustomer customer;

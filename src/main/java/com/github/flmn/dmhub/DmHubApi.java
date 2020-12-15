@@ -5,184 +5,144 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.github.flmn.dmhub.dto.DmhAccessToken;
-import com.github.flmn.dmhub.dto.DmhData;
-import com.github.flmn.dmhub.dto.DmhResult;
-import com.github.flmn.dmhub.dto.DmhScopes;
-import com.github.flmn.dmhub.dto.customer.DmhCreateCustomerRequest;
-import com.github.flmn.dmhub.dto.customer.DmhCustomer;
-import com.github.flmn.dmhub.dto.customer.DmhIdMappingResult;
-import com.github.flmn.dmhub.dto.event.DmhEvent;
-import com.github.flmn.dmhub.dto.wechat.DmhWechatPubAccount;
+import com.github.flmn.dmhub.basic.DmhOpsForBasic;
+import com.github.flmn.dmhub.campaign.DmhOpsForCampaign;
+import com.github.flmn.dmhub.common.dto.DmhAccessToken;
+import com.github.flmn.dmhub.content.DmhOpsForContent;
+import com.github.flmn.dmhub.customer.DmhOpsForCustomer;
+import com.github.flmn.dmhub.deal.DmhOpsForDeal;
+import com.github.flmn.dmhub.event.DmhOpsForEvent;
 import com.github.flmn.dmhub.exception.DmHubSdkException;
+import com.github.flmn.dmhub.goods.DmhOpsForGoods;
+import com.github.flmn.dmhub.list.DmhOpsForList;
+import com.github.flmn.dmhub.membership.DmhOpsForMembership;
+import com.github.flmn.dmhub.tag.DmhOpsForTag;
+import com.github.flmn.dmhub.tenant.DmhOpsForTenant;
+import com.github.flmn.dmhub.udo.DmhOpsForUdo;
+import com.github.flmn.dmhub.wechat.DmhOpsForWechat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import retrofit2.Call;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
-import java.io.IOException;
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Map;
 
 public class DmHubApi {
-    private static final String GRANT_TYPE = "client_credentials";
     private static final int MARGIN = 120; // seconds
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final DmHubApiConfiguration cfg;
-    private DmHubApiInterface dmHubApiInterface;
     private boolean initialized = false;
     private String accessToken;
     private Instant validUtil;
+    private final DmHubApiConfiguration cfg;
+    private final Retrofit retrofit;
+    private final DmhOpsForBasic opsForBasic;
+    private final DmhOpsForCustomer opsForCustomer;
+    private final DmhOpsForList opsForList;
+    private final DmhOpsForTag opsForTag;
+    private final DmhOpsForEvent opsForEvent;
+    private final DmhOpsForDeal opsForDeal;
+    private final DmhOpsForGoods opsForGoods;
+    private final DmhOpsForMembership opsForMembership;
+    private final DmhOpsForWechat opsForWechat;
+    private final DmhOpsForCampaign opsForCampaign;
+    private final DmhOpsForTenant opsForTenant;
+    private final DmhOpsForUdo opsForUdo;
+    private final DmhOpsForContent opsForContent;
 
     public DmHubApi(DmHubApiConfiguration cfg) {
         this.cfg = cfg;
-    }
 
-    public void init() throws DmHubSdkException {
         final ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-        Retrofit retrofit = new Retrofit.Builder()
+        this.retrofit = new Retrofit.Builder()
                 .baseUrl(cfg.getServerUrl())
                 .addConverterFactory(JacksonConverterFactory.create(objectMapper))
                 .build();
 
-        this.dmHubApiInterface = retrofit.create(DmHubApiInterface.class);
+        this.opsForBasic = new DmhOpsForBasic(this);
+        this.opsForCustomer = new DmhOpsForCustomer(this);
+        this.opsForList = new DmhOpsForList(this);
+        this.opsForTag = new DmhOpsForTag(this);
+        this.opsForEvent = new DmhOpsForEvent(this);
+        this.opsForDeal = new DmhOpsForDeal(this);
+        this.opsForGoods = new DmhOpsForGoods(this);
+        this.opsForMembership = new DmhOpsForMembership(this);
+        this.opsForWechat = new DmhOpsForWechat(this);
+        this.opsForCampaign = new DmhOpsForCampaign(this);
+        this.opsForTenant = new DmhOpsForTenant(this);
+        this.opsForUdo = new DmhOpsForUdo(this);
+        this.opsForContent = new DmhOpsForContent(this);
+    }
 
+    public <T> T create(Class<T> clazz) {
+        return retrofit.create(clazz);
+    }
+
+    public synchronized void init() throws DmHubSdkException {
         //
         refreshAccessToken();
 
         initialized = true;
     }
 
-    public DmhScopes getScopes() {
-        check();
-
-        Call<DmhScopes> call = dmHubApiInterface.oauth2Scopes(accessToken);
-
-        return result(call, "getScopes");
+    public DmhOpsForBasic opsForBasic() {
+        return opsForBasic;
     }
 
-    // ******************** 客户 ********************
-
-    public DmhCustomer createCustomer(DmhCreateCustomerRequest request, boolean forceUpdate) {
-        check();
-
-        Call<DmhCustomer> call = dmHubApiInterface.customers(accessToken,
-                forceUpdate,
-                request);
-
-        return result(call, "createCustomer");
+    public DmhOpsForCustomer opsForCustomer() {
+        return opsForCustomer;
     }
 
-    public DmhResult bulkCreateCustomer(List<DmhCreateCustomerRequest> request, boolean forceUpdate) {
-        check();
-
-        Call<DmhResult> call = dmHubApiInterface.customersBulkAdd(accessToken,
-                forceUpdate,
-                request);
-
-        return result(call, "bulkCreateCustomer");
+    public DmhOpsForList opsForList() {
+        return opsForList;
     }
 
-    public DmhData<DmhCustomer> listCustomers(String select,
-                                              String sort,
-                                              Integer limit,
-                                              Long id,
-                                              ZonedDateTime dateJoin,
-                                              ZonedDateTime lastUpdated,
-                                              String stage,
-                                              String mobile,
-                                              String email) throws DmHubSdkException {
-        check();
-
-        Call<DmhData<DmhCustomer>> call = dmHubApiInterface.customers(accessToken,
-                select,
-                sort,
-                limit,
-                id,
-                dateJoin,
-                lastUpdated,
-                stage,
-                mobile,
-                email);
-
-        return result(call, "listCustomers");
+    public DmhOpsForTag opsForTag() {
+        return opsForTag;
     }
 
-    public DmhCustomer findCustomerByIdentity(String identityType, String identityValue) {
-        check();
-
-        Call<DmhCustomer> call = dmHubApiInterface.customerServiceFindCustomerByIdentity(accessToken,
-                identityType,
-                identityValue);
-
-        return result(call, "findCustomerByIdentity");
+    public DmhOpsForEvent opsForEvent() {
+        return opsForEvent;
     }
 
-    public String customerIdToClCid(Long customerId) {
-        check();
-
-        Call<DmhIdMappingResult> call = dmHubApiInterface.customerServiceIdMapping(accessToken,
-                customerId,
-                null);
-
-        DmhIdMappingResult result = result(call, "customerIdToClCid");
-
-        return result.getClCid();
+    public DmhOpsForDeal opsForDeal() {
+        return opsForDeal;
     }
 
-    public Long clCidToCustomerId(String clCid) {
-        check();
-
-        Call<DmhIdMappingResult> call = dmHubApiInterface.customerServiceIdMapping(accessToken,
-                null,
-                clCid);
-
-        DmhIdMappingResult result = result(call, "clCidToCustomerId");
-
-        return result.getCustomerId();
+    public DmhOpsForGoods opsForGoods() {
+        return opsForGoods;
     }
 
-    // ******************** 客户事件 ********************
-
-    public DmhEvent createEvent(DmhEvent event, boolean trackIp) {
-        check();
-
-        event.setId(null);
-
-        Call<Map<String, Object>> call = dmHubApiInterface.customerEvents(accessToken, trackIp, event.toMap());
-
-        Map<String, Object> result = mapResult(call, "createEvent");
-
-        if (result == null) {
-            return null;
-        }
-
-        return new DmhEvent(result);
+    public DmhOpsForMembership opsForMembership() {
+        return opsForMembership;
     }
 
-    // ******************** 微信 ********************
-
-    public DmhData<DmhWechatPubAccount> listWechatPubAccounts() throws DmHubSdkException {
-        check();
-
-        Call<DmhData<DmhWechatPubAccount>> call = dmHubApiInterface.wechatPubAccounts(accessToken);
-
-        return result(call, "listWechatPubAccounts");
+    public DmhOpsForWechat opsForWechat() {
+        return opsForWechat;
     }
 
-    // ******************** 私有方法 ********************
+    public DmhOpsForCampaign opsForCampaign() {
+        return opsForCampaign;
+    }
 
-    private void check() throws DmHubSdkException {
+    public DmhOpsForTenant opsForTenant() {
+        return opsForTenant;
+    }
+
+    public DmhOpsForUdo opsForUdo() {
+        return opsForUdo;
+    }
+
+    public DmhOpsForContent opsForContent() {
+        return opsForContent;
+    }
+
+    public String getAccessToken() throws DmHubSdkException {
         if (!initialized) {
             throw new DmHubSdkException("Please call init() first.");
         }
@@ -190,9 +150,9 @@ public class DmHubApi {
         Instant now = Instant.now();
         if (now.isAfter(validUtil)) { // 如果当前时间已经超出有效期，同步刷新
             refreshAccessToken();
-
-            return;
         }
+
+        return accessToken;
     }
 
     private synchronized void refreshAccessToken() throws DmHubSdkException {
@@ -200,8 +160,7 @@ public class DmHubApi {
             return;
         }
 
-        Call<DmhAccessToken> call = dmHubApiInterface.oauth2Token(cfg.getAppId(), cfg.getAppSecret(), GRANT_TYPE);
-        DmhAccessToken dmhAccessToken = result(call, "getAccessToken");
+        DmhAccessToken dmhAccessToken = opsForBasic.getAccessToken(cfg.getAppId(), cfg.getAppSecret());
 
         if (dmhAccessToken == null) {
             logger.warn("refreshAccessToken error: dmhAccessToken is null");
@@ -225,44 +184,5 @@ public class DmHubApi {
 
         accessToken = dmhAccessToken.getAccessToken();
         validUtil = Instant.now().plus(dmhAccessToken.getExpiresIn() - MARGIN, ChronoUnit.SECONDS);
-    }
-
-    // 结果检查
-    private <T extends DmhResult> T result(Call<T> call, String func) {
-        try {
-            Response<T> response = call.execute();
-            if (response.isSuccessful()) {
-                logger.info("{}, code={}, message={}", func, response.code(), response.message());
-
-                return response.body();
-            } else {
-                logger.warn("{} not successful, code={}, message={}", func, response.code(), response.message());
-
-                return null;
-            }
-        } catch (IOException e) {
-            logger.warn("{}, IOException, message={}", func, e.getMessage());
-
-            return null;
-        }
-    }
-
-    private Map<String, Object> mapResult(Call<Map<String, Object>> call, String func) {
-        try {
-            Response<Map<String, Object>> response = call.execute();
-            if (response.isSuccessful()) {
-                logger.info("{}, code={}, message={}", func, response.code(), response.message());
-
-                return response.body();
-            } else {
-                logger.warn("{} not successful, code={}, message={}", func, response.code(), response.message());
-
-                return null;
-            }
-        } catch (IOException e) {
-            logger.warn("{}, IOException, message={}", func, e.getMessage());
-
-            return null;
-        }
     }
 }

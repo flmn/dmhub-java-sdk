@@ -1,4 +1,4 @@
-package com.github.flmn.dmhub.dto;
+package com.github.flmn.dmhub.common.dto;
 
 import com.github.flmn.dmhub.util.TimeUtils;
 import com.github.flmn.util.NumberUtils;

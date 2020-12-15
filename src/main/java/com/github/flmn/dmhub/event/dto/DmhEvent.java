@@ -1,7 +1,7 @@
-package com.github.flmn.dmhub.dto.event;
+package com.github.flmn.dmhub.event.dto;
 
-import com.github.flmn.dmhub.dto.DmhResult;
-import com.github.flmn.dmhub.dto.HasCustomFields;
+import com.github.flmn.dmhub.common.dto.DmhResult;
+import com.github.flmn.dmhub.common.dto.HasCustomFields;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
