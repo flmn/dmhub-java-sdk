@@ -18,7 +18,7 @@ repositories {
 ```groovy
 dependencies {
     ...
-    implementation 'com.github.flmn:trivial-java-utils:0.1.0'
+    implementation 'com.github.flmn:trivial-java-utils:0.1.1'
     ...
 }
 ```

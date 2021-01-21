@@ -1,40 +1,17 @@
-package com.github.flmn.dmhub;
+package com.github.flmn.dmhub.customer;
 
+import com.github.flmn.dmhub.BaseTest;
 import com.github.flmn.dmhub.common.dto.DmhData;
 import com.github.flmn.dmhub.common.dto.DmhResult;
-import com.github.flmn.dmhub.customer.DmhOpsForCustomer;
-import com.github.flmn.dmhub.customer.dto.DmhCreateCustomerRequest;
-import com.github.flmn.dmhub.customer.dto.DmhCustomer;
-import com.github.flmn.dmhub.customer.dto.DmhGenders;
-import com.github.flmn.dmhub.customer.dto.DmhIdentity;
-import com.github.flmn.dmhub.event.DmhOpsForEvent;
-import com.github.flmn.dmhub.event.dto.DmhEvent;
-import com.github.flmn.dmhub.exception.DmHubSdkException;
+import com.github.flmn.dmhub.customer.dto.*;
 import com.github.flmn.dmhub.util.TimeUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Collections;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class DmHubApiTest {
-    private DmHubApi dmHubApi;
-
-    @BeforeAll
-    void setUp() {
-        DmHubApiConfigurationBuilder builder = new DmHubApiConfigurationBuilder();
-        builder.serverUrl("https://api.convertlab.com/v2/")
-                .appId("YOUR_APP_ID")
-                .appSecret("YOUR_APP_SECRET");
-
-        dmHubApi = new DmHubApi(builder.build());
-        try {
-            dmHubApi.init();
-        } catch (DmHubSdkException e) {
-            System.out.println(e);
-        }
-    }
+class DmhOpsForCustomerTest extends BaseTest {
 
     @Test
     @Disabled
@@ -146,30 +123,11 @@ class DmHubApiTest {
 
     @Test
     @Disabled
-    void createEvent() {
-        DmhEvent event = new DmhEvent();
-        event.setCustomerId(814443154529861632L);
-        event.setEvent("c_sdk_test");
-        event.setDate(ZonedDateTime.now(ZoneOffset.UTC));
-        event.setSource("人民广场");
-        event.setSource1("销售部");
-        event.addCustomField("c_sdk_version", "0.0.3");
+    void createIdentity() {
+        DmhOpsForCustomer ops = dmHubApi.opsForCustomer();
 
-        DmhOpsForEvent ops = dmHubApi.opsForEvent();
-        event = ops.createEvent(event, false);
+        DmhCustomerIdentity customerIdentity = ops.createIdentity(897590518215763968L, "mobile", "13012345678");
 
-        System.out.println(event);
+        System.out.println(customerIdentity);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-

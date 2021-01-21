@@ -2,9 +2,7 @@ package com.github.flmn.dmhub.customer;
 
 import com.github.flmn.dmhub.common.dto.DmhData;
 import com.github.flmn.dmhub.common.dto.DmhResult;
-import com.github.flmn.dmhub.customer.dto.DmhCreateCustomerRequest;
-import com.github.flmn.dmhub.customer.dto.DmhCustomer;
-import com.github.flmn.dmhub.customer.dto.DmhIdMappingResult;
+import com.github.flmn.dmhub.customer.dto.*;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -47,4 +45,8 @@ public interface DmhCustomerInterface {
     Call<DmhIdMappingResult> customerServiceIdMapping(@Query("access_token") String accessToken,
                                                       @Query("customerId") Long customerId,
                                                       @Query("cl_cid") String clCid);
+
+    @POST("customerIdentities")
+    Call<DmhCustomerIdentity> createIdentity(@Query("access_token") String accessToken,
+                                             @Body DmhCreateIdentityRequest request);
 }

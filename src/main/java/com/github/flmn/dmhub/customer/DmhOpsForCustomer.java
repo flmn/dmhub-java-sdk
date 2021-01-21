@@ -4,9 +4,7 @@ import com.github.flmn.dmhub.DmHubApi;
 import com.github.flmn.dmhub.common.DmhOps;
 import com.github.flmn.dmhub.common.dto.DmhData;
 import com.github.flmn.dmhub.common.dto.DmhResult;
-import com.github.flmn.dmhub.customer.dto.DmhCreateCustomerRequest;
-import com.github.flmn.dmhub.customer.dto.DmhCustomer;
-import com.github.flmn.dmhub.customer.dto.DmhIdMappingResult;
+import com.github.flmn.dmhub.customer.dto.*;
 import com.github.flmn.dmhub.exception.DmHubSdkException;
 import retrofit2.Call;
 
@@ -90,5 +88,24 @@ public final class DmhOpsForCustomer extends DmhOps {
         DmhIdMappingResult result = result(call, "clCidToCustomerId");
 
         return result.getCustomerId();
+    }
+
+    /**
+     * 添加客户身份
+     *
+     * @param customerId 客户ID
+     * @param type       身份类型
+     * @param value      身份值
+     */
+    public DmhCustomerIdentity createIdentity(long customerId, String type, String value) {
+        DmhCreateIdentityRequest request = new DmhCreateIdentityRequest();
+        request.setCustomerId(customerId);
+        request.setType(type);
+        request.setValue(value);
+
+        Call<DmhCustomerIdentity> call = customerInterface.createIdentity(api.getAccessToken(),
+                request);
+
+        return result(call, "createIdentity");
     }
 }
