@@ -5,6 +5,10 @@ public class DmhResult {
     private String message;
     private DmhError error;
 
+    public boolean hasError() {
+        return success != null && !success;
+    }
+
     @Override
     public String toString() {
         return "DmhResult{" +

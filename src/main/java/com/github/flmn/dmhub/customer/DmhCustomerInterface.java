@@ -49,4 +49,8 @@ public interface DmhCustomerInterface {
     @POST("customerIdentities")
     Call<DmhCustomerIdentity> createIdentity(@Query("access_token") String accessToken,
                                              @Body DmhCreateIdentityRequest request);
+
+    @POST("customerIdentityService/bulkGetByCustomerId")
+    Call<DmhBulkGetByCustomerIdResult> bulkGetByCustomerId(@Query("access_token") String accessToken,
+                                                           @Body DmhBulkGetByCustomerIdRequest request);
 }

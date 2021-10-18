@@ -6,12 +6,16 @@ import com.github.flmn.dmhub.common.dto.DmhData;
 import com.github.flmn.dmhub.common.dto.DmhResult;
 import com.github.flmn.dmhub.customer.dto.*;
 import com.github.flmn.dmhub.exception.DmHubSdkException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import retrofit2.Call;
 
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.List;
 
 public final class DmhOpsForCustomer extends DmhOps {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final DmHubApi api;
     private final DmhCustomerInterface customerInterface;
 
@@ -107,5 +111,23 @@ public final class DmhOpsForCustomer extends DmhOps {
                 request);
 
         return result(call, "createIdentity");
+    }
+
+    public List<DmhCustomerIdentity> bulkGetIdentities(List<Long> customerIds) {
+        DmhBulkGetByCustomerIdRequest request = new DmhBulkGetByCustomerIdRequest();
+        request.setCustomerIds(customerIds);
+
+        Call<DmhBulkGetByCustomerIdResult> call = customerInterface.bulkGetByCustomerId(api.getAccessToken(),
+                request);
+
+        DmhBulkGetByCustomerIdResult result = result(call, "bulkGetIdentities");
+
+        if (result != null && result.hasError()) {
+            logger.warn("bulkGetIdentities error, {}", result);
+
+            return Collections.emptyList();
+        }
+
+        return result.getData();
     }
 }

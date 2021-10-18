@@ -9,7 +9,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 class DmhOpsForCustomerTest extends BaseTest {
 
@@ -111,6 +113,7 @@ class DmhOpsForCustomerTest extends BaseTest {
     }
 
     @Test
+    @Disabled
     void idMapping() {
         DmhOpsForCustomer ops = dmHubApi.opsForCustomer();
         String clCid = ops.customerIdToClCid(814443154529861632L);
@@ -129,5 +132,17 @@ class DmhOpsForCustomerTest extends BaseTest {
         DmhCustomerIdentity customerIdentity = ops.createIdentity(897590518215763968L, "mobile", "13012345678");
 
         System.out.println(customerIdentity);
+    }
+
+    @Test
+    void bulkGetIdentities() {
+        DmhOpsForCustomer ops = dmHubApi.opsForCustomer();
+
+        List<Long> customerIds = new ArrayList<>();
+        customerIds.add(1093485448065482752L);
+
+        List<DmhCustomerIdentity> identities = ops.bulkGetIdentities(customerIds);
+
+        System.out.println(identities);
     }
 }
