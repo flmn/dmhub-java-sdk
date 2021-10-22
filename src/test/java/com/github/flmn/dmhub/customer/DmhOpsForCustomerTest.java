@@ -78,7 +78,7 @@ class DmhOpsForCustomerTest extends BaseTest {
     }
 
     @Test
-    @Disabled
+//    @Disabled
     void listCustomers() {
         DmhOpsForCustomer ops = dmHubApi.opsForCustomer();
         DmhData<DmhCustomer> customers = ops.listCustomers(null,
@@ -135,6 +135,7 @@ class DmhOpsForCustomerTest extends BaseTest {
     }
 
     @Test
+    @Disabled
     void bulkGetIdentities() {
         DmhOpsForCustomer ops = dmHubApi.opsForCustomer();
 
