@@ -78,7 +78,7 @@ class DmhOpsForCustomerTest extends BaseTest {
     }
 
     @Test
-//    @Disabled
+    @Disabled
     void listCustomers() {
         DmhOpsForCustomer ops = dmHubApi.opsForCustomer();
         DmhData<DmhCustomer> customers = ops.listCustomers(null,
@@ -145,5 +145,22 @@ class DmhOpsForCustomerTest extends BaseTest {
         List<DmhCustomerIdentity> identities = ops.bulkGetIdentities(customerIds);
 
         System.out.println(identities);
+    }
+
+    @Test
+    @Disabled
+    void registerPushInfo() {
+        DmhOpsForCustomer ops = dmHubApi.opsForCustomer();
+
+        PushInfoRegisterRequest request = new PushInfoRegisterRequest();
+        request.setProvider("plugin");
+        request.setAppKey("ma");
+        request.setPushId("2345678910JQKA");
+        request.setOs("ios");
+        request.setCustomerId(1118698964347144192L);
+
+        PushInfoRegisterResult result = ops.registerPushInfo(request, null);
+
+        System.out.println(result);
     }
 }

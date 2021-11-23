@@ -6,6 +6,7 @@ import com.github.flmn.dmhub.common.dto.DmhData;
 import com.github.flmn.dmhub.common.dto.DmhResult;
 import com.github.flmn.dmhub.customer.dto.*;
 import com.github.flmn.dmhub.exception.DmHubSdkException;
+import com.github.flmn.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
@@ -129,5 +130,14 @@ public final class DmhOpsForCustomer extends DmhOps {
         }
 
         return result.getData();
+    }
+
+    public PushInfoRegisterResult registerPushInfo(PushInfoRegisterRequest request, String identityPriorityStrategy) {
+        if (StringUtils.isBlank(identityPriorityStrategy)) {
+            identityPriorityStrategy = "system";
+        }
+        Call<PushInfoRegisterResult> call = customerInterface.pushInfoRegister(api.getAccessToken(), identityPriorityStrategy, request);
+
+        return result(call, "registerPushInfo");
     }
 }

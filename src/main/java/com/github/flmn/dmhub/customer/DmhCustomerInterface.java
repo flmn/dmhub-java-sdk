@@ -53,4 +53,11 @@ public interface DmhCustomerInterface {
     @POST("customerIdentityService/bulkGetByCustomerId")
     Call<DmhBulkGetByCustomerIdResult> bulkGetByCustomerId(@Query("access_token") String accessToken,
                                                            @Body DmhBulkGetByCustomerIdRequest request);
+
+    // 客户App推送身份
+    @POST("pushInfo/register")
+    Call<PushInfoRegisterResult> pushInfoRegister(@Query("access_token") String accessToken,
+                                                  @Query("identityPriorityStrategy") String identityPriorityStrategy,
+                                                  @Body PushInfoRegisterRequest request);
+
 }
