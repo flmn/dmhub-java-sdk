@@ -7,12 +7,26 @@ import java.time.ZonedDateTime;
 public class PushInfoRegisterResult extends DmhResult {
     private Long customerId;
     private String customerIdStr;
-    private ZonedDateTime dateCreated;
-    private ZonedDateTime lastUpdated;
     private String provider;
     private String appKey;
     private String pushId;
     private String os;
+    private ZonedDateTime dateCreated;
+    private ZonedDateTime lastUpdated;
+
+    @Override
+    public String toString() {
+        return "PushInfoRegisterResult{" +
+                "customerId=" + customerId +
+                ", customerIdStr='" + customerIdStr + '\'' +
+                ", provider='" + provider + '\'' +
+                ", appKey='" + appKey + '\'' +
+                ", pushId='" + pushId + '\'' +
+                ", os='" + os + '\'' +
+                ", dateCreated=" + dateCreated +
+                ", lastUpdated=" + lastUpdated +
+                "} " + super.toString();
+    }
 
     public Long getCustomerId() {
         return customerId;
@@ -28,22 +42,6 @@ public class PushInfoRegisterResult extends DmhResult {
 
     public void setCustomerIdStr(String customerIdStr) {
         this.customerIdStr = customerIdStr;
-    }
-
-    public ZonedDateTime getDateCreated() {
-        return dateCreated;
-    }
-
-    public void setDateCreated(ZonedDateTime dateCreated) {
-        this.dateCreated = dateCreated;
-    }
-
-    public ZonedDateTime getLastUpdated() {
-        return lastUpdated;
-    }
-
-    public void setLastUpdated(ZonedDateTime lastUpdated) {
-        this.lastUpdated = lastUpdated;
     }
 
     public String getProvider() {
@@ -76,5 +74,21 @@ public class PushInfoRegisterResult extends DmhResult {
 
     public void setOs(String os) {
         this.os = os;
+    }
+
+    public ZonedDateTime getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(ZonedDateTime dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public ZonedDateTime getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(ZonedDateTime lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
 }

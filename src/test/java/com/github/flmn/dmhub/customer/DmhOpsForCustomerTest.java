@@ -157,10 +157,25 @@ class DmhOpsForCustomerTest extends BaseTest {
         request.setAppKey("ma");
         request.setPushId("2345678910JQKA");
         request.setOs("ios");
-        request.setCustomerId(1118698964347144192L);
+//        request.setCustomerId(1093357162467567616L);
+
+        DmhIdentity identity = new DmhIdentity();
+        identity.setType("c_oneid");
+        identity.setValue("13800138000");
+        request.setCustomerIdentities(Collections.singletonList(identity));
 
         PushInfoRegisterResult result = ops.registerPushInfo(request, null);
 
         System.out.println(result);
+    }
+
+    @Test
+//    @Disabled
+    void getPushInfoByCustomerIdentity() {
+        DmhOpsForCustomer ops = dmHubApi.opsForCustomer();
+
+        List<PushInfoRegisterResult> list = ops.getPushInfoByCustomerIdentity("c_oneid", "13800138000");
+
+        System.out.println(list);
     }
 }

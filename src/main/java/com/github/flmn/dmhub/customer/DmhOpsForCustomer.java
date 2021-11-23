@@ -136,8 +136,21 @@ public final class DmhOpsForCustomer extends DmhOps {
         if (StringUtils.isBlank(identityPriorityStrategy)) {
             identityPriorityStrategy = "system";
         }
+
         Call<PushInfoRegisterResult> call = customerInterface.pushInfoRegister(api.getAccessToken(), identityPriorityStrategy, request);
 
         return result(call, "registerPushInfo");
+    }
+
+    public List<PushInfoRegisterResult> getPushInfoByCustomerIdentity(String identityType, String identityValue) {
+        Call<PushInfoGetByCustomerIdentityResult> call = customerInterface.pushInfoGetByCustomerIdentity(api.getAccessToken(), identityType, identityValue);
+
+        PushInfoGetByCustomerIdentityResult result = result(call, "getPushInfoByCustomerIdentity");
+
+        if (result == null) {
+            return Collections.emptyList();
+        }
+
+        return result.getData();
     }
 }

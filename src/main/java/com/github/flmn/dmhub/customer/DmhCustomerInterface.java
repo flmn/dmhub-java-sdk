@@ -60,4 +60,8 @@ public interface DmhCustomerInterface {
                                                   @Query("identityPriorityStrategy") String identityPriorityStrategy,
                                                   @Body PushInfoRegisterRequest request);
 
+    @GET("pushInfo/getByCustomerIdentity")
+    Call<PushInfoGetByCustomerIdentityResult> pushInfoGetByCustomerIdentity(@Query("access_token") String accessToken,
+                                                                            @Query("identityType") String identityType,
+                                                                            @Query("identityValue") String identityValue);
 }
